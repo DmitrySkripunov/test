@@ -18,7 +18,7 @@ export default function Home() {
   const debouncedQuery = useDebounce<string>(query, 250);
 
   useEffect(() => {
-    dispatch(CharacterEvents.Search, debouncedQuery);
+    dispatch(CharacterEvents.Search, { query: debouncedQuery });
   }, [debouncedQuery]);
 
   const changeQuery = (event: React.ChangeEvent<HTMLInputElement>) =>
@@ -56,8 +56,32 @@ export default function Home() {
       {results.count > 0 && <StyledResultBlock>{people}</StyledResultBlock>}
 
       <Box display="flex" width="100%" justifyContent="center" mt="15px">
-        {results.previous && !request.inProgress && <Button>Previous</Button>}
-        {results.next && !request.inProgress && <Button>Next</Button>}
+        {results.previous && (
+          <Button
+            disabled={request.inProgress}
+            onClick={() =>
+              dispatch(CharacterEvents.Search, {
+                query: results.previous ? results.previous : "",
+                isUrl: true,
+              })
+            }
+          >
+            Previous
+          </Button>
+        )}
+        {results.next && (
+          <Button
+            disabled={request.inProgress}
+            onClick={() =>
+              dispatch(CharacterEvents.Search, {
+                query: results.next ? results.next : "",
+                isUrl: true,
+              })
+            }
+          >
+            Next
+          </Button>
+        )}
       </Box>
     </Layout>
   );

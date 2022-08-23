@@ -11,7 +11,7 @@ export interface State {
 }
 
 export interface Events {
-  [CharacterEvents.Search]: string;
+  [CharacterEvents.Search]: { query: string; isUrl?: boolean };
   [CharacterEvents.Get]: string;
   [CharacterEvents.UpdateResults]: SearchResult<Character>;
   [CharacterEvents.UpdateRequest]: Request;
@@ -29,14 +29,14 @@ export const characters: StoreonModule<State, Events> = (store) => {
     request: { inProgress: false },
   }));
 
-  store.on(CharacterEvents.Search, async ({}, query) => {
+  store.on(CharacterEvents.Search, async ({}, { isUrl, query }) => {
     if (query.length === 0) return;
 
     store.dispatch(CharacterEvents.UpdateRequest, { inProgress: true });
 
     try {
       const result = await fetch(
-        `https://swapi.dev/api/people/?search=${query}`
+        isUrl ? query : `https://swapi.dev/api/people/?search=${query}`
       );
       const results = await result.json();
 
