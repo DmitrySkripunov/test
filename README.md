@@ -2,7 +2,7 @@
 
 2. I'm not a big fan of TypeScript, so there are could be some roughness.
 
-3. I didn't implement an abortable fetch because didnn't want to spend that extra time.
+3. Implementation of abortable fetches is not perfect, bit working....Didn't have so much extra time.
 
 4. Use the Storeon library instead Redux, MobX etc, because the Storeon as much tiny and simple as possible.
 
