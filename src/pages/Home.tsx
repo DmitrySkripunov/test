@@ -15,7 +15,7 @@ export default function Home() {
     "request"
   );
   const [query, setQuery] = useState("");
-  const debouncedQuery = useDebounce<string>(query, 250);
+  const debouncedQuery = useDebounce<string>(query, 0);
 
   useEffect(() => {
     dispatch(CharacterEvents.Search, { query: debouncedQuery });
