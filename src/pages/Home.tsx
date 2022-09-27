@@ -68,7 +68,7 @@ export default function Home() {
 
       {results.count === 0 && (
         <Box textAlign="center" m="50px auto">
-          Empty result
+          {request.inProgress ? 'Searching...' : 'Empty result'}
         </Box>
       )}
 
