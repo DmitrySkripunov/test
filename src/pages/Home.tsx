@@ -1,6 +1,7 @@
 import styled from "@emotion/styled";
 import { Box, Button, LinearProgress, TextField } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useStoreon } from "storeon/react";
 import CharacterCard from "../components/CharacterCard/CharacterCard";
 import Layout from "../components/Layout/Layout";
@@ -14,19 +15,37 @@ export default function Home() {
     "results",
     "request"
   );
-  const [query, setQuery] = useState("");
+  let [searchParams, setSearchParams] = useSearchParams();
+  const notInitialRender = useRef(false)
+
+  const navigate = useNavigate();
+  const [query, setQuery] = useState(searchParams.get('query') || '');
   const debouncedQuery = useDebounce<string>(query, 250);
 
   useEffect(() => {
-    dispatch(CharacterEvents.Search, { query: debouncedQuery });
+    if (notInitialRender.current) {
+      searchParams.set('query', debouncedQuery);
+      searchParams.delete('page');
+      setSearchParams(searchParams);
+    } else {
+      notInitialRender.current = true
+    }
+
   }, [debouncedQuery]);
 
-  const changeQuery = (event: React.ChangeEvent<HTMLInputElement>) =>
-    setQuery(event.target.value);
+  useEffect(() => {
+    const page = searchParams.get('page');
+    const query = searchParams.get('query');
+
+    dispatch(CharacterEvents.Search, { query: page || query || '', isUrl: page !== null });
+  }, [searchParams]);
+
+  const changeQuery = (event: React.ChangeEvent<HTMLInputElement>) => setQuery(event.target.value);
 
   const people = results.results.map((character) => (
     <CharacterCard key={character.url} character={character} />
   ));
+
 
   return (
     <Layout>
@@ -59,12 +78,8 @@ export default function Home() {
         {results.previous && (
           <Button
             disabled={request.inProgress}
-            onClick={() =>
-              dispatch(CharacterEvents.Search, {
-                query: results.previous ? results.previous : "",
-                isUrl: true,
-              })
-            }
+            onClick={() => navigate( `/?page=${encodeURIComponent(results.previous || '')}&query=${query}`  )
+           }
           >
             Previous
           </Button>
@@ -72,12 +87,9 @@ export default function Home() {
         {results.next && (
           <Button
             disabled={request.inProgress}
-            onClick={() =>
-              dispatch(CharacterEvents.Search, {
-                query: results.next ? results.next : "",
-                isUrl: true,
-              })
-            }
+            onClick={() => {
+              navigate(`/?page=${encodeURIComponent(results.next || '')}&query=${query}`);
+            }}
           >
             Next
           </Button>
