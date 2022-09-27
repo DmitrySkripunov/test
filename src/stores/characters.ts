@@ -35,7 +35,7 @@ export const characters: StoreonModule<State, Events> = (store) => {
   }));
 
   store.on(CharacterEvents.Search, async ({}, { isUrl, query }) => {
-    if (query.length === 0) return;
+    // if (query.length === 0) return;
 
     store.dispatch(CharacterEvents.UpdateRequest, { inProgress: true });
 
